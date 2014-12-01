@@ -31,6 +31,11 @@
 
 namespace maidsafe {
 
+typedef boost::error_info<struct common_tag_errno_code, CommonErrors> CommonErrorCode;
+typedef boost::error_info<struct routing_tag_errno_code, RoutingErrors> RoutingErrorCode;
+typedef boost::error_info<struct nfs_tag_errno_code, NfsErrors> NfsErrorCode;
+typedef boost::error_info<struct vault_tag_errno_code, VaultErrors> VaultErrorCode;
+
 typedef detail::BoundedString<1> NonEmptyString;
 typedef detail::BoundedString<64, 64> Identity;
 
