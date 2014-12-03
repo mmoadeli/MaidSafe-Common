@@ -30,6 +30,20 @@
 
 namespace maidsafe {
 
+#define MAIDSAFE_THROW_EXCEPTION(x) \
+BOOST_THROW_EXCEPTION(test_error() << x)
+
+typedef boost::error_info<struct tag_errno_info, std::string> error_info;
+
+struct test_error : virtual std::exception, virtual boost::exception {
+ void AddInfo(const std::string& info) {
+  if (const std::string* error = boost::get_error_info<error_info>(*this))
+   *this << error_info(*error + ", " + info);
+  else
+   *this << error_info(info);
+ }
+};
+
 class maidsafe_error : public std::system_error {
  public:
   typedef TaggedValue<std::string, struct SerialisedErrorTag> serialised_type;
