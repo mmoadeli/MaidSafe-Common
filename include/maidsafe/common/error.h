@@ -45,6 +45,19 @@ class maidsafe_error : public std::system_error {
   maidsafe_error(int ev, const std::error_category& ecat)
       : std::system_error(ev, ecat), value_(0) {}
 
+  void AddInfo(std::string info) {
+    std::string what_arg{what()};
+    std::string default_message{code().category().message(code().value())};
+    if (what_arg.size() == default_message.size()) {  // First time this is being called
+      what_arg = std::move(info);
+    } else {  // Already have additional info plus default message - strip default message since it gets appended again
+      what_arg =
+      what_arg.substr(0, what_arg.size() - default_message.size() - 2) + ", " + std::move(info);
+    }
+    maidsafe_error error(code(), what_arg);
+    std::swap(*this, error);
+  }
+ 
   template<typename Archive>
   Archive& serialize(Archive& ref_archive) {
     return ref_archive(value_);
