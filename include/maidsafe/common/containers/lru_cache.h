@@ -42,6 +42,10 @@
 #include <tuple>
 #include <utility>
 
+#include "boost_expected/boost/expected/expected.hpp"
+
+#include "maidsafe/common/types.h"
+
 namespace maidsafe {
 
 namespace detail {
@@ -153,16 +157,15 @@ class LruCache : public detail::LruCacheBase<KeyType, ValueType> {
 
   // We do not return an iterator here and use a pair instead as we are keeping two containers in
   // sync and cannot allow access to these containers from the public interface
-  std::pair<bool, ValueType> Get(const KeyType& key) {
+  boost::expected<ValueType, bool> Get(const KeyType& key) {
     const auto it = this->storage_.find(key);
 
     if (it == this->storage_.end()) {
-      return std::make_pair(false, ValueType());
-    } else {
-      // Update access record by moving accessed key to back of list
-      this->key_order_.splice(this->key_order_.end(), this->key_order_, std::get<0>(it->second));
-      return std::make_pair(true, std::get<2>(it->second));
+      return boost::make_unexpected(true);
     }
+    // Update access record by moving accessed key to back of list
+    this->key_order_.splice(this->key_order_.end(), this->key_order_, std::get<0>(it->second));
+    return std::get<2>(it->second);
   }
 
   void Add(KeyType key, ValueType value) {

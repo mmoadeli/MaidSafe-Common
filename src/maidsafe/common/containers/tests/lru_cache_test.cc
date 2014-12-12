@@ -30,28 +30,53 @@ namespace maidsafe {
 
 namespace test {
 
-TEST(LruCacheTest, BEH_SizeOnlyTest) {
+TEST(LruCacheTest, BEH_SizeOnlyTest1) {
   auto size(10);
-  LruCache<int, int> cache(size);
+  LruCache<int, NonEmptyString> cache(size);
 
   for (int i(0); i < 10; ++i) {
     EXPECT_EQ(cache.size(), i);
-    cache.Add(i, i);
+    cache.Add(i, NonEmptyString(std::to_string(i)));
     EXPECT_EQ(cache.size(), i + 1);
   }
 
-  for (int i(10); i < 1000; ++i) {
+  for (int i(10); i < 20; ++i) {
     EXPECT_EQ(cache.size(), size);
-    cache.Add(i, i);
+    cache.Add(i, NonEmptyString(std::to_string(i)));
     EXPECT_EQ(cache.size(), size);
   }
 
-  for (int i(1000); i > 0; --i) {
-    EXPECT_TRUE(cache.Check(1000 - 1));
-    EXPECT_TRUE(cache.Get(1000 - 1).first);
-    EXPECT_EQ(cache.Get(1000 - 1).second, 1000 - 1);
+  for (int i(20); i > 0; --i) {
+    EXPECT_TRUE(cache.Check(20 - 1));
+    auto result(cache.Get(20 - 1));
+    EXPECT_FALSE(result);
+    EXPECT_EQ(result.error(), true);
+    EXPECT_EQ(*cache.Get(20 - 1), NonEmptyString(std::to_string(19)));
   }
 }
+
+//TEST(LruCacheTest, BEH_SizeOnlyTest) {
+//  auto size(10);
+//  LruCache<int, int> cache(size);
+
+//  for (int i(0); i < 10; ++i) {
+//    EXPECT_EQ(cache.size(), i);
+//    cache.Add(i, i);
+//    EXPECT_EQ(cache.size(), i + 1);
+//  }
+
+//  for (int i(10); i < 1000; ++i) {
+//    EXPECT_EQ(cache.size(), size);
+//    cache.Add(i, i);
+//    EXPECT_EQ(cache.size(), size);
+//  }
+
+//  for (int i(1000); i > 0; --i) {
+//    EXPECT_TRUE(cache.Check(1000 - 1));
+//    EXPECT_FALSE(cache.Get(1000 - 1));
+//    EXPECT_EQ(*cache.Get(1000 - 1), 1000 - 1);
+//  }
+//}
 
 TEST(LruCacheTest, BEH_TimeOnlyTest) {
   std::chrono::milliseconds time(100);
