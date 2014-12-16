@@ -57,7 +57,7 @@ class maidsafe_error : public std::system_error {
     maidsafe_error error(code(), what_arg);
     std::swap(*this, error);
   }
- 
+
   template<typename Archive>
   Archive& serialize(Archive& ref_archive) {
     return ref_archive(value_);
